@@ -46,7 +46,8 @@ I'm looking enemy robot's first sample and I check if I block it with only takin
 
  ### Choosing Sample
  I change my sample pick method.
- ```rs
+
+ ```rust
  fn pickBestSampleV2(player:&Player,availables:[i32;5]) -> Sample{
     let mut best = player.inventory[0].clone();
     let mut max = 99;
@@ -70,7 +71,8 @@ And I take with minimum number.
 
 ### Taking Molecules
 I create a neededMolecule function to choose least remaining molecule.
-```rs
+
+```rust
 fn neededMolecule(cost : [i32;5],availables: [i32;5],player : &Player) -> usize{
     let mut lessLeft = 99;
     let mut need = 5;
@@ -86,7 +88,8 @@ fn neededMolecule(cost : [i32;5],availables: [i32;5],player : &Player) -> usize{
 
 ### Choosing Rank
 Also I create choosing rank system as my total expertise.
-```rs
+
+```rust
            if totalExpertise(players[0].expertise)+(players[0].inventory.len() as i32)< 4{
             collectSample(1, &players[0]);
             }else if totalExpertise(players[0].expertise) +(players[0].inventory.len() as i32) < 10 {
@@ -104,7 +107,7 @@ In silver I update so many things.
 ### Taking Molecules
 Now I'm taking molecules for completing mulptiple samples at once. And I change my molecule choosing system. Now I'm giving score to every molecule and take with most score.
 
-```rs
+```rust
 fn calculateMoleculeScore(molecule : usize,enemy: &Player,availables: [i32;5]) -> i32{
 
     let totalEnemyNeed = calculateEnemyNeed(enemy, molecule);
@@ -122,7 +125,7 @@ My robot became more aggrasive in late game.
 ### Choosing Sample
 I update my choosing sample function. Now I'm giving score to every sample and I take with most score.
 
-```rs
+```rust
 fn calculateSampleScore(sample : &Sample,player: &Player,availables: [i32;5],molecules:[i32;5]) -> i32{
 
     let gainAdvantage = calculateGainAdvantage(sample, player);
