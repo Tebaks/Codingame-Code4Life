@@ -7,6 +7,8 @@
   - [Wood 2 to Wood 1](#wood-2-to-wood-1)
   - [Wood 1 to Bronz](#wood-1-to-bronze)
   - [Bronze to Silver](#bronze-to-silver)
+  - [Silver](#silver)
+  - [Summary](#summary)
 
 </details>
 
@@ -130,4 +132,15 @@ fn calculateSampleScore(sample : &Sample,player: &Player,availables: [i32;5],mol
 }
 ```
 I give score to sample as how many molecule need to complate and how much effect their expertise gain.
+## Set Sample Done
+One of the most smartest thing i did I set done samples as done and I pretend like I got their expertise and this way I can save 1 or 2 molecule.
+## Choosing Rank
+I update my choosing rank function taking 3 two's and 3 three's can be problem sometimes so I made it hardcoded.
+```rs
+   let rankOrder = [1,1,1,1,1,1,1,2,2,1,2,2,2,3,2,3,2,3,2,3,3,2,3,3,2,3,2,3,2,3,2,3];
+```
+
+# Summary
+Overall I tried 10 hours to get silver and 20-30 hours to gold but I stuck on Silver #2/500 and #500 in total I did my best. Mostly first I do what enemy do and than improve it. Most effective thing is being aggresive.
+
 

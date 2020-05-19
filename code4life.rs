@@ -1,4 +1,5 @@
 use std::io;
+use std::cell::Cell;
 
 macro_rules! parse_input {
     ($x:expr, $t:ident) => {
@@ -14,37 +15,38 @@ struct Sample {
     gain: String,
     health: i32,
     cost: [i32; 5],
+    isDone: Cell<bool>,
 }
 
 struct Player {
     target: String,
     molecules: [i32; 5],
+    remainMolecules: [i32;5],
     expertise: [i32; 5],
     inventory: Vec<Sample>,
 }
-
+// Check if sample is blocked or not.
 fn isBlocked(sample:Sample,player:&Player,availables:[i32;5]) -> bool{
     for x in 0..5 {
         if (sample.cost[x] - player.molecules[x] - player.expertise[x] -availables[x] >0) {
-            eprintln!("blocklanmış");
             return true;
             }
         }
-        eprintln!("blocklanmamış");
         return false;
 }
+// find minimum number of needed molecule to block sample.
 fn minNeededNumberToBlock(sample: Sample, player:&Player,availables:[i32;5]) -> i32 {
     let mut minNeed = 99;
         for x in 0..5 {
             if (sample.cost[x] - player.molecules[x] -player.expertise[x]) > 0{
-                if ((availables[x] - (sample.cost[x] - player.molecules[x] -player.expertise[x])) +1) < minNeed{
-                    minNeed = ((availables[x] - (sample.cost[x] - player.molecules[x] -player.expertise[x])) +1);
+                if ((availables[x] - (sample.cost[x] - player.molecules[x] -player.expertise[x]))) < minNeed{
+                    minNeed = ((availables[x] - (sample.cost[x] - player.molecules[x] -player.expertise[x])) );
                     }
                 }
             }
-        eprintln!("en az {}",minNeed);
         return minNeed;
 }
+// find molecule which is least needed to block sample
 fn minNeededMoleculeToBlock(sample: Sample,player:&Player,availables:[i32;5]) -> usize{
     let mut minNeed = 99;
     let mut minNeededMolecule = 0;
@@ -57,8 +59,52 @@ fn minNeededMoleculeToBlock(sample: Sample,player:&Player,availables:[i32;5]) ->
             }
         return minNeededMolecule as usize;
 }
-                    
+// find find minimum number of needed molecule to block ALL samples.
+fn minNeededNumberToBlockAll (player:&Player,availables:[i32;5]) -> i32{
+       let mut minNeed = 99;
 
+       for x in 0..player.inventory.len(){
+           let min = minNeededNumberToBlock(player.inventory[x].clone(),player,availables);
+           if min < minNeed{
+               minNeed = min;
+           }
+       }
+       return minNeed;
+}
+//find molecule which is minimum number of needed to block sample.
+fn minNeededMoleculeToBlockAll(player:&Player,availables:[i32;5]) -> usize{
+    let sample = minNeededSampleToBlockAll(player,availables);
+    
+    return minNeededMoleculeToBlock(sample,player,availables);
+}
+
+
+fn minNeededSampleToBlockAll(player:&Player,availables:[i32;5])->Sample{
+
+let mut sample =  player.inventory[0].clone();
+    let mut minNeed = 99;
+    for x in 0..player.inventory.len(){
+           let min = minNeededNumberToBlock(player.inventory[x].clone(),player,availables);
+           if min < minNeed{
+               minNeed = min;
+               sample = player.inventory[x].clone();
+           }
+       }
+
+return sample
+}
+// find total number molecule to block all samples.
+fn totalNeededNumberToBlockAll(player:&Player,availables:[i32;5]) -> i32{
+    let mut totalNeed = 0;
+
+    for x in 0..player.inventory.len(){
+        totalNeed += minNeededNumberToBlock(player.inventory[x].clone(),player,availables);
+    }
+
+    return totalNeed;
+}
+                    
+/* old version of pick best sample.
 fn pickBestSample(player : &Player,availables: [i32;5]) -> Sample{
     let mut best = player.inventory[0].clone();
     let mut highest = 0;
@@ -69,43 +115,52 @@ fn pickBestSample(player : &Player,availables: [i32;5]) -> Sample{
                 }
                 }
     return best;
-}
-fn pickBestSampleV2(player:&Player,availables:[i32;5]) -> Sample{
+}*/
+//pick best sample with least molecule
+fn pickBestSampleV2(player:&Player,availables:[i32;5],molecules:[i32;5]) -> Option<Sample>{
     let mut best = player.inventory[0].clone();
     let mut max = 99;
-        for x in 0..player.inventory.len() {
-        if canMake(&player,availables,player.inventory[x].clone()){
-                let mut temp = getSampleTotalNeededMolecule(&player.inventory[x], player);
-                
-                if temp < max {
+    let samples = getMakeableSamples(player.inventory.clone(),availables,player,molecules);
+    if samples.len() > 0{
+    }
+    
+    if samples.len() == 0 {
+        return None;
+    }
+        for x in 0..samples.len() {
+            if(samples[x].health != -1){
+                let letter : Vec<char> = samples[x].gain.chars().collect();
+                let mut temp = getSampleTotalNeededMolecule(&samples[x], player,molecules);
+                if temp < max && !&samples[x].isDone.get(){
                 max = temp;
-                best = player.inventory[x].clone();
+                best = samples[x].clone();
                 }
             }
+}
+        return Some(best);
+}
+// check if sample can madeable or not  
+fn canMake(player: &Player,availables:[i32;5],sample:Sample,molecules:[i32;5]) -> bool{
+      let doneSamples = getDoneSamples(player);
+    let mut gainMolecules = [0,0,0,0,0];
+    for y in 0..doneSamples.len(){
+        if(doneSamples[y].health != -1){
+        let letter : Vec<char> = doneSamples[y].gain.chars().collect();
+        gainMolecules[letterToNumber(letter[0])] += 1;
         }
-        return best;
-}
-fn basicAttack(player:&Player,availables:[i32;5]) -> usize{
-        for x in 0..2 {
-            if player.molecules[x] == 0 && availables[x] != 0{
-                return x;
-                }
-            }
-        return 5;
-}
+    }
             
-fn canMake(player: &Player,availables:[i32;5],sample:Sample) -> bool{
-            if getPlayerTotalMolecule(&player) + getSampleTotalNeededMolecule(&sample,&player) > 10{
+            if (getPlayerTotalMolecule(&player) + getSampleTotalNeededMolecule(&sample,&player,molecules)) > 10{
             return false;
             }
          for x in 0..5{
-           if  (sample.cost[x] - player.molecules[x]-availables[x]-player.expertise[x] > 0){
+           if  (sample.cost[x] - (molecules[x] +availables[x] + player.expertise[x] + gainMolecules[x])) > 0  {
            return false;
            }
            }
            return true;
 }
-
+// self-explain
 fn getPlayerTotalMolecule (player:&Player) ->i32{
         let mut total = 0;
         for x in 0..5{
@@ -113,24 +168,132 @@ fn getPlayerTotalMolecule (player:&Player) ->i32{
             }
         return total;
 }
-fn getSampleTotalNeededMolecule (sample :&Sample,player:&Player) ->i32{
+// self-explain
+fn getSampleTotalNeededMolecule (sample :&Sample,player:&Player,molecules:[i32;5]) ->i32{
         let mut total = 0;
+          let doneSamples = getDoneSamples(player);
+    let mut gainMolecules = [0,0,0,0,0];
+    for y in 0..doneSamples.len(){
+        if(doneSamples[y].health != -1){
+        let letter : Vec<char> = doneSamples[y].gain.chars().collect();
+        gainMolecules[letterToNumber(letter[0])] += 1;
+        }
+    }
         for x in 0..5{
-            if(sample.cost[x]- player.expertise[x] >= 0){
-            total += sample.cost[x] - player.expertise[x];
+            if(sample.cost[x]- player.expertise[x]-molecules[x] -gainMolecules[x] >= 0){
+            total += sample.cost[x] - player.expertise[x] - molecules[x] - gainMolecules[x];
             }
         }
         return total;
 }
+// find sample with most score.
+fn pickBestSampleV3(player:&Player,availables :[i32;5],molecules:[i32;5],enemy:&Player) -> Option<Sample>{
+    let mut best = player.inventory[0].clone();
+    let mut max = -99;
+    let samples = getMakeableSamples(player.inventory.clone(),availables,player,molecules);
+    if samples.len() > 0{
+    }
+    
+    if samples.len() == 0 {
+        return None;
+    }
+    if enemy.target != "MOLECULES" && player.target == "MOLECULES"{
+        let mut max = -99;
+        let mut maxSample = samples[0].clone();
+        for y in 0..samples.len(){
+            let totalNeed = getSampleTotalNeededMolecule(&samples[y],player,molecules);
+            if totalNeed > max{
+                max =totalNeed;
+                maxSample = samples[y].clone();
+            }
+        }
+        return Some(maxSample);
+    }
+        for x in 0..samples.len() {
+            if(samples[x].health != -1){
+                let mut temp = calculateSampleScore(&samples[x],player,availables,molecules);
+                eprintln!("score = {}", temp);
+                if temp > max && !&samples[x].isDone.get(){
+                max = temp;
+                best = samples[x].clone();
+                }
+            }
+}
+    
+        return Some(best);
+}
+// calculate sample's score.
+fn calculateSampleScore(sample : &Sample,player: &Player,availables: [i32;5],molecules:[i32;5]) -> i32{
+
+    let needError = calculateNeedError(sample,player);
+    let gainAdvantage = calculateGainAdvantage(sample, player);
+    let minNeed = calculateMinPickUp(sample,player);
+
+    return 30 - minNeed + gainAdvantage;
+}
+// calculate minimum need for sample
+fn calculateMinPickUp(sample:&Sample,player:&Player) -> i32{
+    let mut minNeed = 0;
+
+    for x in 0..5{
+        if(sample.cost[x] > player.expertise[x]){
+            minNeed += sample.cost[x] - player.expertise[x];
+        }
+    }
+
+    return minNeed;
+}
+// find servable sample with only expertise and player.molecule
+fn getReadyToServeSample(samples:Vec<Sample>,player:&Player)->Sample{
+    let mut sample = samples[0].clone();
+
+
+    for x in 0..samples.len(){
+        let mut canMake = true;
+        for y in 0..5{
+            if(samples[x].cost[y] - player.molecules[y] - player.expertise[y] > 0 ){
+                canMake = false;
+            }
+        }
+        if canMake{
+            return samples[x].clone();
+        }
+    }
+    return sample;
+
+}
+
+// calculate advantage coming with sample's expertise gain
+fn calculateGainAdvantage(sample:&Sample,player:&Player) ->i32{
+     let letter : Vec<char> = sample.gain.chars().collect();
+     let gain = letterToNumber(letter[0]);
+
+    let mut advantage = 0;
+    for x in 0..player.inventory.len(){
+        if(sample.id != player.inventory[x].id){
+            if(player.inventory[x].cost[gain] > player.expertise[gain]){
+                advantage += 1;
+            }
+        }
+    }
+    return advantage;
+
+}
             
         
         
-        
-fn getNeededMolecule(cost : [i32;5],availables: [i32;5],player : &Player) -> usize{
+// Old version of find needed molecule to complate sample
+fn getNeededMolecule(cost : [i32;5],availables: [i32;5],player : &Player,molecules:[i32;5]) -> usize{
     let mut lessLeft = 99;
     let mut need = 5;
+    let doneSamples = getDoneSamples(player);
+    let mut gainMolecules = [0,0,0,0,0];
+    for y in 0..doneSamples.len(){
+        let letter : Vec<char> = doneSamples[y].gain.chars().collect();
+        gainMolecules[letterToNumber(letter[0])] += 1;
+    }
     for x in 0..5{
-        if cost[x]-player.molecules[x]-player.expertise[x] > 0 && availables[x] < lessLeft{
+        if cost[x]-molecules[x]-player.expertise[x]-gainMolecules[x] > 0 && availables[x] < lessLeft && !(availables[x] <= 0){
         lessLeft = availables[x];
         need = x;
         }
@@ -139,8 +302,63 @@ fn getNeededMolecule(cost : [i32;5],availables: [i32;5],player : &Player) -> usi
         
         
 }
+// find needed molecule with most score to complate sample
+fn getNeededMoleculeV2(cost : [i32;5],availables: [i32;5],player : &Player,enemy:&Player,molecules:[i32;5]) -> usize{
+    let mut bestScore = -99;
+    let mut need = 5;
+    let doneSamples = getDoneSamples(player);
+    let mut gainMolecules = [0,0,0,0,0];
+    for y in 0..doneSamples.len(){
+        let letter : Vec<char> = doneSamples[y].gain.chars().collect();
+        gainMolecules[letterToNumber(letter[0])] += 1;
+    }
+    for x in 0..5{
+        if cost[x]-molecules[x]-player.expertise[x]-gainMolecules[x] > 0 && !(availables[x] <= 0){
+            let moleculeScore = calculateMoleculeScore(x,enemy,availables);
+            if(moleculeScore > bestScore){
+                bestScore = moleculeScore;
+                need = x;
+            }
+        }
+        }
+    return need;
+        
+        
+}
+
+//self-explain
+fn calculateMoleculeScore(molecule : usize,enemy: &Player,availables: [i32;5]) -> i32{
+
+    let totalEnemyNeed = calculateEnemyNeed(enemy, molecule);
 
 
+    return totalEnemyNeed - availables[molecule];
+}
+
+// calculate how many enemy need this molecule
+fn calculateEnemyNeed(enemy:&Player,molecule:usize) -> i32{
+    let mut totalEnemyNeed = 0;
+    for x in 0..enemy.inventory.len(){
+        let enemyNeed =enemy.inventory[x].cost[molecule]-enemy.molecules[molecule]-enemy.expertise[molecule];
+        if( enemyNeed > 0){
+            totalEnemyNeed += enemyNeed;
+        }
+    }
+
+    return totalEnemyNeed;
+}
+// find all makeable samples
+fn getMakeableSamples(samples: Vec<Sample>,availables: [i32;5], player: &Player,molecules:[i32;5]) -> Vec<Sample>{
+    let mut makeableSamples = Vec::new();
+    for x in 0..samples.len(){
+        if canMake(player,availables,samples[x].clone(),molecules){
+            makeableSamples.push(samples[x].clone());
+        }
+    }
+    return makeableSamples;
+}
+
+// check if sample need diagnosis
 fn checkForDiagnosis(samples: &Vec<Sample>) -> Sample{
     for x in 0..samples.len(){
         if samples[x].health == -1{
@@ -149,7 +367,7 @@ fn checkForDiagnosis(samples: &Vec<Sample>) -> Sample{
         }
     return samples[0].clone();
 }
-
+// go or connect diagnosis
 fn goDiagnosis(id: i32, player: &Player) {
     if player.target == "DIAGNOSIS" {
         println!("CONNECT {}", id);
@@ -157,6 +375,7 @@ fn goDiagnosis(id: i32, player: &Player) {
         println!("GOTO DIAGNOSIS");
     }
 }
+// go or connect samples
 fn goSamples(rank: i32, player: &Player) {
     if player.target == "SAMPLES" {
         println!("CONNECT {}", rank);
@@ -164,6 +383,7 @@ fn goSamples(rank: i32, player: &Player) {
         println!("GOTO SAMPLES");
     }
 }
+// go or connect molecules
 fn goMolecules(need: i32, player: &Player) {
     if player.target == "MOLECULES" {
         println!("CONNECT {}", numberToLetter(need));
@@ -171,6 +391,7 @@ fn goMolecules(need: i32, player: &Player) {
         println!("GOTO MOLECULES");
     }
 }
+// go or connect laboratory
 fn goLaboratory(id: i32, player: &Player) {
     if player.target == "LABORATORY" {
         println!("CONNECT {}", id);
@@ -178,12 +399,111 @@ fn goLaboratory(id: i32, player: &Player) {
         println!("GOTO LABORATORY");
     }
 }
+//get players total expertise
 fn getPlayerTotalExpertise(expertises:[i32;5]) ->i32{
     let mut total = 0;
     for x in 0..5{
         total += expertises[x];
         }
         return total as i32;
+}
+// get remain molecules with removing done samples
+fn getRemainMolecules(player:&Player)->[i32;5] { 
+    let mut molecules = player.molecules;
+    for x in 0..player.inventory.len(){
+        if (player.inventory[x].isDone.get()){
+            for y in 0..5{
+                if player.inventory[x].cost[y] != 0{
+                if player.expertise[y] >= player.inventory[x].cost[y] {
+                    molecules[y] = molecules[y];
+                }else if ((molecules[y] + player.expertise[y] - player.inventory[x].cost[y]) >= 0){
+                molecules[y] = molecules[y] + player.expertise[y] - player.inventory[x].cost[y];
+                }else {
+                molecules[y]  = 0;
+                }
+                }
+                
+            }
+        }
+    }
+    return molecules;
+}
+// self-explain
+fn setSamplesDone(player:&Player,availables:[i32;5],molecules:[i32;5],enemy:&Player){
+    if(player.inventory.len() >0){
+    let mut sample = player.inventory[0].clone();
+    let mut isNone =false;
+    for x in 0..player.inventory.len(){
+        let molecules = getRemainMolecules(player);
+
+        let bestSample = pickBestSampleV3(player,availables,molecules,enemy);
+
+        match bestSample{
+                    Some(x) =>{
+                        sample = x;
+                        isNone =false;
+                    },
+                    None => isNone = true,
+                }
+        if(!isNone){
+        let mut isDone = checkSampleDone(player,sample.cost,molecules);
+        if(isDone){
+            for y in 0..player.inventory.len(){
+                if sample.id == player.inventory[y].id{
+                    player.inventory[y].isDone.set(true);
+                }
+            }
+        }else{
+            if player.inventory.len() == 2{
+                for c in 0..player.inventory.len(){
+                    if(player.inventory[c].id != sample.id){
+                        sample = player.inventory[c].clone();
+                    }
+                }
+            }
+            isDone = checkSampleDone(player,sample.cost,molecules);
+        if(isDone){
+            for y in 0..player.inventory.len(){
+                if sample.id == player.inventory[y].id{
+                    player.inventory[y].isDone.set(true);
+                }
+            }
+        }
+
+        }
+        }
+    }
+    }
+}
+// check if sample is done or not
+fn checkSampleDone(player:&Player,cost:[i32;5],molecules:[i32;5]) -> bool{
+    let doneSamples = getDoneSamples(player);
+    let mut gainMolecules = [0,0,0,0,0];
+    for y in 0..doneSamples.len(){
+        if(doneSamples[y].health != -1){
+        let letter : Vec<char> = doneSamples[y].gain.chars().collect();
+        gainMolecules[letterToNumber(letter[0])] += 1;
+        }
+    }
+    for x in 0..5{
+        if cost[x] - molecules[x]- gainMolecules[x] - player.expertise[x] > 0 {
+            return false;
+        }
+    }
+    return true;
+
+}
+
+// find all done samples
+fn getDoneSamples(player:&Player)-> Vec<Sample>{
+    let mut doneSamples = Vec::new();
+    for x in 0..player.inventory.len(){
+        if(player.inventory[x].isDone.get()){
+            doneSamples.push(player.inventory[x].clone());
+        }
+    }
+    
+    return doneSamples;
 }
         
 
@@ -197,6 +517,16 @@ fn numberToLetter(number: i32) -> char {
         _ => 'F',
     }
 }
+fn letterToNumber(letter: char) -> usize {
+    match letter {
+         'A' => 0,
+         'B' => 1,
+         'C' => 2,
+         'D' => 3,
+         'E' => 4,
+          _  => 5,
+    }
+}
 
 /**
  * Bring data on patient samples from the diagnosis machine to the laboratory with enough molecules to produce medicine!
@@ -204,6 +534,7 @@ fn numberToLetter(number: i32) -> char {
 fn main() {
     let mut fulled = false; 
     let mut firstRound = true;
+    let mut raund = 0;
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
     let project_count = parse_input!(input_line, i32);
@@ -243,6 +574,7 @@ fn main() {
             let player = Player {
                 target: target,
                 molecules: [storage_a, storage_b, storage_c, storage_d, storage_e],
+                remainMolecules : [storage_a, storage_b, storage_c, storage_d, storage_e],
                 expertise: [expertise_a,expertise_b,expertise_c,expertise_d,expertise_e],
                 inventory: Vec::new(),
             };
@@ -282,63 +614,149 @@ fn main() {
                 gain: expertise_gain,
                 health: health,
                 cost: cost,
+                isDone: Cell::new(false),
             };
             samples.push(sample.clone());
             if carried_by > -1 {
                 players[carried_by as usize].inventory.push(sample);
             }
         }
+        raund += 1;
+
+        let rankOrder = [1,1,1,1,1,1,1,2,2,1,2,2,2,3,2,3,2,3,2,3,3,2,3,3,2,3,2,3,2,3,2,3];
+    
         let me = &players[0];
         let enemy = &players[1];
-        
-        
-        if me.inventory.len() == 0{
+        let mut totalSample = 3;
+        if firstRound {
+            totalSample = 2;
+            }
+        if me.inventory.len() == (totalSample){
+            fulled = true;
+            firstRound = false;
+            }else if me.inventory.len() == 0{
             fulled = false;
             }
-        let mut total = 3;
-        if firstRound {
-            total = 2;
-            }
-        if me.inventory.len() < total && !fulled {
-            if getPlayerTotalExpertise(me.expertise)+(me.inventory.len() as i32)< 4{
+        setSamplesDone(&me,availables,me.molecules,&enemy);
+        let remainMolecules = getRemainMolecules(&me);
+        let doneSamples = getDoneSamples(&me);
+        let totalNeed = totalNeededNumberToBlockAll(enemy,availables);
+        eprintln!("totalNeed = {}",totalNeed);
+        if(doneSamples.len() > 0 && &me.target == "LABORATORY"){
+
+
+            let serveSample = getReadyToServeSample(doneSamples, &me);
+            goLaboratory(serveSample.id, &me);
+        }else{
+            if !fulled {
+                
+                let rankCount = getPlayerTotalExpertise(me.expertise)+(me.inventory.len() as i32);
+                goSamples(rankOrder[rankCount as usize],&me);
+                
+            /*
+            if getPlayerTotalExpertise(me.expertise)+(me.inventory.len() as i32)< 12{
             goSamples(1,&me);
-            }else if getPlayerTotalExpertise(me.expertise) +(me.inventory.len() as i32) < 10 {
+            }else if getPlayerTotalExpertise(me.expertise) +(me.inventory.len() as i32) < 18 {
             goSamples(2,&me);
             }else{
             goSamples(3,&me);
-            };
-            if me.inventory.len() == (total -1){
-            fulled = true;
-            firstRound = false;
-                }
+            }; 
+            */
+            
             
         } else {
             let mut sample = checkForDiagnosis(&me.inventory);
             if  sample.health != -1{
-                sample = pickBestSampleV2(&me,availables);
-        
-                let mut need = getNeededMolecule(sample.cost,availables,&me);
+                let mut isNone = false;
+                let result = pickBestSampleV3(&me,availables,remainMolecules,&enemy);
+                match result{
+                    Some(x) => sample = x,
+                    None => isNone = true,
+                }
+                      eprintln!("best sample = {}",sample.id);
+                if isNone && doneSamples.len() == 0 {
+                    if &me.inventory.len() < &(3 as usize){
+                        fulled = false;
+                        goSamples(2,&me);
+                    }else{
+                        goDiagnosis(me.inventory[0].id,&me);
+                    }               
+                }else{
+                
+                for x in 0..remainMolecules.len(){
+                }
+                
+                let mut need = getNeededMoleculeV2(sample.cost,availables,&me,&enemy,remainMolecules);
+                eprintln!("need = {}",need);
                 if need != 5{
-                     if ((enemy.inventory.len() != 0 && minNeededNumberToBlock(me.inventory[0].clone(),&enemy,availables) < 2) && !(isBlocked(enemy.inventory[0].clone(),&enemy,availables)) && getPlayerTotalMolecule(&me)<10){
+                    let mut blockNumber = 2;
+                    let playerTotalExpertise = getPlayerTotalExpertise(me.expertise);
+                    if  playerTotalExpertise > 16 {
+                        blockNumber = 2;
+                    }else if playerTotalExpertise > 13{
+                        blockNumber = 2;
+                    }else if playerTotalExpertise > 9 {
+                        blockNumber = 2;
+                    }
+                   
+                     if ((enemy.inventory.len() != 0 && minNeededNumberToBlockAll(&enemy,availables) < blockNumber) && !(isBlocked(minNeededSampleToBlockAll(&enemy,availables),&enemy,availables)) && getPlayerTotalMolecule(&me)<10){
                         eprintln!("Trying to block");
-                        need = minNeededMoleculeToBlock(enemy.inventory[0].clone(),&enemy,availables);
+                        need = minNeededMoleculeToBlockAll(&enemy,availables);
                         goMolecules(need as i32, &me);
                         }else{
-                        if !canMake(&me,availables,sample.clone()) || getPlayerTotalMolecule(&me) >=10{
-                        goDiagnosis(sample.id,&me);
+                        if(sample.isDone.get()){
+                            goLaboratory(doneSamples[0].id, &me)
                         }else{
-                    goMolecules(need as i32, &me);
-                    
-                    };
-                    }
-                    
-                } else {
-                    goLaboratory(sample.id, &me);
+                            if !canMake(&me,availables,sample.clone(),remainMolecules) || getPlayerTotalMolecule(&me) >=10{
+                        if doneSamples.len() > 0 {
+                            goLaboratory(doneSamples[0].id, &me)
+                        }else{
+                            goDiagnosis(sample.id, &me)
+                        }
+                        }else{
+                            if &me.target == "LABORATORY"{
+                                if(raund > 140 && &me.inventory.len() > &(1 as usize) || raund > 160){
+                                    goMolecules(need as i32, &me)
+                                }else{
+                                    fulled = false;
+                                    goSamples(2,&me);
+                                }
+                           
+
+                            }else{
+                        goMolecules(need as i32, &me);   
+                            }              
+                    };  
+                        }
+                }
+                                    
+                } else { 
+                    if doneSamples.len() > 0 {
+                            goLaboratory(doneSamples[0].id, &me)
+                        }else{
+                            if &me.target == "LABORATORY"{
+                                if(raund > 140 && &me.inventory.len() > &(1 as usize) || raund > 160){
+                                    goMolecules(need as i32, &me)
+                                }else{
+                                    fulled = false;
+                                    goSamples(2,&me);  
+                                }
+
+                            }else{
+                            goMolecules(need as i32, &me);   
+                            } 
+                        }
+                     
+                }
                 }
             } else {
                 goDiagnosis(sample.id, &me);
             }
         }
+        }
+    
+        
+        
 
         // Write an action using println!("message...");
         // To debug: eprintln!("Debug message...");
