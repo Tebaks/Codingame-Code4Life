@@ -17,7 +17,7 @@
 # Wood 2 to Wood 1
 I just store all samples and take sample with most score. And thats enough for rank up to Wood 1.
 
-```rs
+```rust
 fn pickBestSample(player : &Player,availables: [i32;5]) -> Sample{
     let mut best = player.inventory[0].clone();
     let mut highest = 0;
@@ -36,15 +36,15 @@ fn pickBestSample(player : &Player,availables: [i32;5]) -> Sample{
 ```
 
 # Wood 1 to Bronz   
-In this league now we should diogneise our samples so first I took 3 undiagnosed sample and diagnoise all.
+In this league now we should diogneise our samples so first I took 3 undiagnosed sample and diagnoise all. Boss robot wasn't smart in this league so I just beat him with taking rank 2 samples.
 
 # Bronze to Silver
 In bronze I decided to play more aggresively and I create a attack function.
 
- ## Attack Function
+ ### Attack Function
 I'm looking enemy robot's first sample and I check if I block it with only taking 1 molecule, if I can I take that molecule anyway.
 
- ## Choosing Sample
+ ### Choosing Sample
  I change my sample pick method.
  ```rs
  fn pickBestSampleV2(player:&Player,availables:[i32;5]) -> Sample{
@@ -68,7 +68,7 @@ I'm looking enemy robot's first sample and I check if I block it with only takin
 Now I'm choosing the best sample by number of needed molecule.
 And I take with minimum number.
 
-## Taking Molecules
+### Taking Molecules
 I create a neededMolecule function to choose least remaining molecule.
 ```rs
 fn neededMolecule(cost : [i32;5],availables: [i32;5],player : &Player) -> usize{
@@ -84,7 +84,7 @@ fn neededMolecule(cost : [i32;5],availables: [i32;5],player : &Player) -> usize{
 }
 ```
 
-## Choosing Rank
+### Choosing Rank
 Also I create choosing rank system as my total expertise.
 ```rs
            if totalExpertise(players[0].expertise)+(players[0].inventory.len() as i32)< 4{
@@ -101,7 +101,7 @@ I change numbers a lot to fit my strategy. These three big change take me to sil
 # Silver
 In silver I update so many things.
 
-## Taking Molecules
+### Taking Molecules
 Now I'm taking molecules for completing mulptiple samples at once. And I change my molecule choosing system. Now I'm giving score to every molecule and take with most score.
 
 ```rs
@@ -115,11 +115,11 @@ fn calculateMoleculeScore(molecule : usize,enemy: &Player,availables: [i32;5]) -
 ```
 I'm calculating the score as how many my enemy need and how much left.
 
-## Attack Function
+### Attack Function
 I update my attack function. Now I'm looking for every sample that my enemy has and if I can block it with taking 1,2,3 molecule I take it.
 My robot became more aggrasive in late game.
 
-## Choosing Sample
+### Choosing Sample
 I update my choosing sample function. Now I'm giving score to every sample and I take with most score.
 
 ```rs
@@ -132,9 +132,9 @@ fn calculateSampleScore(sample : &Sample,player: &Player,availables: [i32;5],mol
 }
 ```
 I give score to sample as how many molecule need to complate and how much effect their expertise gain.
-## Set Sample Done
+### Set Sample Done
 One of the most smartest thing i did I set done samples as done and I pretend like I got their expertise and this way I can save 1 or 2 molecule.
-## Choosing Rank
+### Choosing Rank
 I update my choosing rank function taking 3 two's and 3 three's can be problem sometimes so I made it hardcoded.
 ```rs
    let rankOrder = [1,1,1,1,1,1,1,2,2,1,2,2,2,3,2,3,2,3,2,3,3,2,3,3,2,3,2,3,2,3,2,3];
