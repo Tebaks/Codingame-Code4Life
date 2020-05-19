@@ -693,14 +693,13 @@ fn main() {
                 let mut need = getNeededMoleculeV2(sample.cost,availables,&me,&enemy,remainMolecules);
                 
                 if need != 5{
+                    // make robot more aggresive in late game
                     let mut blockNumber = 2;
                     let playerTotalExpertise = getPlayerTotalExpertise(me.expertise);
                     if  playerTotalExpertise > 16 {
-                        blockNumber = 2;
+                        blockNumber = 4;
                     }else if playerTotalExpertise > 13{
-                        blockNumber = 2;
-                    }else if playerTotalExpertise > 9 {
-                        blockNumber = 2;
+                        blockNumber = 3;
                     }
                     // if minimum number needed to block is less than blockNumber go block enemy.
                      if ((enemy.inventory.len() != 0 && minNeededNumberToBlockAll(&enemy,availables) < blockNumber) && !(isBlocked(minNeededSampleToBlockAll(&enemy,availables),&enemy,availables)) && getPlayerTotalMolecule(&me)<10){
