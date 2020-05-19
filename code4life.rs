@@ -571,6 +571,7 @@ fn main() {
             let expertise_c = parse_input!(inputs[10], i32);
             let expertise_d = parse_input!(inputs[11], i32);
             let expertise_e = parse_input!(inputs[12], i32);
+            // create players and add them into list
             let player = Player {
                 target: target,
                 molecules: [storage_a, storage_b, storage_c, storage_d, storage_e],
@@ -588,6 +589,7 @@ fn main() {
         let available_c = parse_input!(inputs[2], i32);
         let available_d = parse_input!(inputs[3], i32);
         let available_e = parse_input!(inputs[4], i32);
+        // store every available molecule
         let availables : [i32;5] = [available_a,available_b,available_c,available_d,available_e];
         let mut input_line = String::new();
         io::stdin().read_line(&mut input_line).unwrap();
@@ -607,6 +609,7 @@ fn main() {
             let cost_d = parse_input!(inputs[8], i32);
             let cost_e = parse_input!(inputs[9], i32);
             let cost: [i32; 5] = [cost_a, cost_b, cost_c, cost_d, cost_e];
+            // create samples and add them in to list
             let sample = Sample {
                 id: sample_id,
                 carriedBy: carried_by,
@@ -637,23 +640,24 @@ fn main() {
             }else if me.inventory.len() == 0{
             fulled = false;
             }
+        // Set samples done
         setSamplesDone(&me,availables,me.molecules,&enemy);
+        // get remain molecules using done samples
         let remainMolecules = getRemainMolecules(&me);
         let doneSamples = getDoneSamples(&me);
         let totalNeed = totalNeededNumberToBlockAll(enemy,availables);
-        eprintln!("totalNeed = {}",totalNeed);
+        // if I'm at laboratory and if I have done samples give it all
         if(doneSamples.len() > 0 && &me.target == "LABORATORY"){
-
-
             let serveSample = getReadyToServeSample(doneSamples, &me);
             goLaboratory(serveSample.id, &me);
         }else{
+            // if my hand doesn't full get samples using my rank system
             if !fulled {
                 
                 let rankCount = getPlayerTotalExpertise(me.expertise)+(me.inventory.len() as i32);
                 goSamples(rankOrder[rankCount as usize],&me);
                 
-            /*
+            /* This is my old system
             if getPlayerTotalExpertise(me.expertise)+(me.inventory.len() as i32)< 12{
             goSamples(1,&me);
             }else if getPlayerTotalExpertise(me.expertise) +(me.inventory.len() as i32) < 18 {
@@ -665,15 +669,18 @@ fn main() {
             
             
         } else {
+            // check for diagnosis
             let mut sample = checkForDiagnosis(&me.inventory);
+            // if sample health is -1 it meain we should diagnose it
             if  sample.health != -1{
                 let mut isNone = false;
+                // pick best sample
                 let result = pickBestSampleV3(&me,availables,remainMolecules,&enemy);
                 match result{
                     Some(x) => sample = x,
                     None => isNone = true,
                 }
-                      eprintln!("best sample = {}",sample.id);
+                // if best sample is null and there is no done sample we should take new samples or go diagnoise to release our samples
                 if isNone && doneSamples.len() == 0 {
                     if &me.inventory.len() < &(3 as usize){
                         fulled = false;
@@ -682,12 +689,9 @@ fn main() {
                         goDiagnosis(me.inventory[0].id,&me);
                     }               
                 }else{
-                
-                for x in 0..remainMolecules.len(){
-                }
-                
+                // find needed molecule
                 let mut need = getNeededMoleculeV2(sample.cost,availables,&me,&enemy,remainMolecules);
-                eprintln!("need = {}",need);
+                
                 if need != 5{
                     let mut blockNumber = 2;
                     let playerTotalExpertise = getPlayerTotalExpertise(me.expertise);
@@ -698,32 +702,40 @@ fn main() {
                     }else if playerTotalExpertise > 9 {
                         blockNumber = 2;
                     }
-                   
+                    // if minimum number needed to block is less than blockNumber go block enemy.
                      if ((enemy.inventory.len() != 0 && minNeededNumberToBlockAll(&enemy,availables) < blockNumber) && !(isBlocked(minNeededSampleToBlockAll(&enemy,availables),&enemy,availables)) && getPlayerTotalMolecule(&me)<10){
                         eprintln!("Trying to block");
                         need = minNeededMoleculeToBlockAll(&enemy,availables);
                         goMolecules(need as i32, &me);
                         }else{
+                        // if sample is done go laboratory
                         if(sample.isDone.get()){
                             goLaboratory(doneSamples[0].id, &me)
                         }else{
+                            // else check if we can make or not
                             if !canMake(&me,availables,sample.clone(),remainMolecules) || getPlayerTotalMolecule(&me) >=10{
+                            // if we can't make and we have done samples go laboratory to take point.
                         if doneSamples.len() > 0 {
                             goLaboratory(doneSamples[0].id, &me)
                         }else{
+                            // else it means we should give our samples
                             goDiagnosis(sample.id, &me)
                         }
                         }else{
+                            // if we are at laboratory
                             if &me.target == "LABORATORY"{
+                                // in late game we should finish our all samples
                                 if(raund > 140 && &me.inventory.len() > &(1 as usize) || raund > 160){
                                     goMolecules(need as i32, &me)
                                 }else{
+                                // but in early game we can go samples to take new ones
                                     fulled = false;
                                     goSamples(2,&me);
                                 }
                            
 
                             }else{
+                        // go molecules to finish our best sample
                         goMolecules(need as i32, &me);   
                             }              
                     };  
