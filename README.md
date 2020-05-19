@@ -1,4 +1,7 @@
 # Codingame Code4Life Challange
+# Tebaks - Kenan Abbak
+#### Silver #2/506 
+#### Total #403
 
 <details>
 <summary>Click to expand</summary>
