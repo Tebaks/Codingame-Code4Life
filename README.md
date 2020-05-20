@@ -10,7 +10,9 @@
   - [Wood 1 to Bronz](#wood-1-to-bronze)
   - [Bronze to Silver](#bronze-to-silver)
   - [Silver](#silver)
+  - [My Final Strategy](#my-final-strategy)
   - [Summary](#summary)
+
 
 </details>
 
@@ -150,9 +152,9 @@ I update my choosing rank function taking 3 two's and 3 three's can be problem s
 - If you don't have any samples go samples and take 3 if first round take 2 because enemy can block your molecules.
 - If you have undiagnosed samples go diagnoise station and diagnoit them.
 - If you have diagnoised samples and you can make them go molecules and try to make all it once in given order. For example if we have 2 sample
-(AAA) give expertise c and (BBB) give expertise B my bot will going to take BBBAA and that will be enough to complate both of them becuase I'm also calculating expertise coming from samples.
+"(AAA) gives expertise c" and "(BBB) give expertise B" my bot will going to take BBBAA and that will be enough to complate both of them becuase I'm also calculating expertise coming from samples.
 - If you are at MOLECULES and enemy at somewhere else try to complate sample with most molecule.
-- If you are at MOLECULES and if you can block one of the enemy samples with taking 1,2,3 molecule block it.
+- If you are at MOLECULES and if you can block one of the enemy samples with taking as "blockCount" molecule do it. "blockCount" increasing with player's total expertise, it makes my robot more aggresive in late game.
 - If you can't make any of them release one of them to diagnoise station and take new one from samples station.
 - If you are at LABORATORY and you complate some of the samples give them and go samples station to take new samples. But if raund > 160 and you have 2 samples left go molecules to finish them too. Or raund > 180 go molecules to finish them even you have 1 sample.
 
