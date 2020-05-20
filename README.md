@@ -1,4 +1,4 @@
-# Codingame Code4Life Challange
+# Codingame Code4Life Challenge
 # Tebaks - Kenan Abbak
 #### Silver #2/506 
 #### Total #403
@@ -40,13 +40,13 @@ fn pickBestSample(player : &Player,availables: [i32;5]) -> Sample{
 ```
 
 # Wood 1 to Bronz   
-In this league now we should diogneise our samples so first I took 3 undiagnosed sample and diagnoise all. Boss robot wasn't smart in this league so I just beat him with taking rank 2 samples.
+In this league now we should diagnose our samples so first I took 3 undiagnosed sample and diagnose all. Boss robot wasn't smart in this league so I just beat him with taking rank 2 samples.
 
 # Bronze to Silver
-In bronze I decided to play more aggresively and I create a attack function.
+In bronze I decided to play more aggresively and I create an attack function.
 
  ## Attack Function
-I'm looking enemy robot's first sample and I check if I block it with only taking 1 moleculei if I can block just take it. Result of this sometimes I have so many unneccesary molecules but this function increase my win rate by %10-15.
+I'm looking enemy robot's first sample and I check if I block it with only taking 1 molecule if I can block just take it. Result of this sometimes I have so many unneccesary molecules but this function increase my win rate by %10-15.
 
  ## Choosing Sample
  I change my sample pick method.
@@ -109,7 +109,7 @@ I change numbers a lot to fit my strategy. These three big change take me to sil
 In silver I update so many things.
 
 ## Taking Molecules
-Now I'm taking molecules for completing mulptiple samples at once. And I change my molecule choosing system. Now I'm giving score to every molecule and take with most score.
+Now I'm taking molecules for completing multiple samples at once. And I change my molecule choosing system. Now I'm giving score to every molecule and take with most score.
 
 ```rust
 fn calculateMoleculeScore(molecule : usize,enemy: &Player,availables: [i32;5]) -> i32{
@@ -124,7 +124,7 @@ I'm calculating the score as how many my enemy need and how much left.
 
 ## Attack Function
 I update my attack function. Now I'm looking for every sample that my enemy has and if I can block it with taking 1,2,3 molecule I take it.
-My robot became more aggresive in late game because with expertises making samples become easier so I can spend my mollecules bound (10) to block enemy samples.
+My robot became more aggresive in late game because with expertises making samples become easier so I can spend my molecules bound (10) to block enemy samples.
 
 ## Choosing Sample
 I update my choosing sample function. Now I'm giving score to every sample and I take with most score.
@@ -140,7 +140,7 @@ fn calculateSampleScore(sample : &Sample,player: &Player,availables: [i32;5],mol
 ```
 I give score to sample as how many molecule need to complate and how much effect their expertise gain.
 ## Set Sample Done
-One of the most smartest thing i did I set done samples as done and I pretend like I got their expertise and this way I can save 1 or 2 molecule. At the start of turn I simulate picking best sample and I check if it is done or not if it is done i set is flag true and I update remain molecules by removing dome samples molecules and I prevent we already have their expertise it saves 1-2 molecule per turn this was the most efficent thing I do in this challange. I repeat this as player inventory size so basicly I simulate program and I set done if samples done in this way I can complate multiple samples when I'm at molecules station. Implementing this actually took 7-8 hours.
+One of the most smartest thing i did I set done samples as done and I pretend like I got their expertise and this way I can save 1 or 2 molecule. At the start of turn I simulate picking best sample and I check if it is done or not if it is done i set is flag true and I update remain molecules by removing dome samples molecules and I prevent we already have their expertise it saves 1-2 molecule per turn this was the most efficient thing I do in this challenge. I repeat this as player inventory size so basicly I simulate program and I set done if samples done in this way I can complete multiple samples when I'm at molecules station. Implementing this actually took 7-8 hours.
 ## Choosing Rank
 I update my choosing rank function taking 3 two's and 3 three's can be problem sometimes so I made it hardcoded. It is not perfect but it is better than old one.
 ```rs
@@ -150,16 +150,16 @@ I update my choosing rank function taking 3 two's and 3 three's can be problem s
 # My Final Strategy
 - If you are at laboratory and you have done samples give all.
 - If you don't have any samples go samples and take 3 if first round take 2 because enemy can block your molecules.
-- If you have undiagnosed samples go diagnoise station and diagnoit them.
-- If you have diagnoised samples and you can make them go molecules and try to make all it once in given order. For example if we have 2 sample
-"(AAA) gives expertise c" and "(BBB) give expertise B" my bot will going to take BBBAA and that will be enough to complate both of them becuase I'm also calculating expertise coming from samples.
-- If you are at MOLECULES and enemy at somewhere else try to complate sample with most molecule.
+- If you have undiagnosed samples go diagnosis station and diagnose them.
+- If you have diagnosed samples and you can make them go molecules and try to make all it once in given order. For example if we have 2 sample
+"(AAA) gives expertise c" and "(BBB) give expertise B" my bot will going to take BBBAA and that will be enough to complete both of them because I'm also calculating expertise coming from samples.
+- If you are at MOLECULES and enemy at somewhere else try to complete sample with most molecule.
 - If you are at MOLECULES and if you can block one of the enemy samples with taking as "blockCount" molecule do it. "blockCount" increasing with player's total expertise, it makes my robot more aggresive in late game.
-- If you can't make any of them release one of them to diagnoise station and take new one from samples station.
-- If you are at LABORATORY and you complate some of the samples give them and go samples station to take new samples. But if raund > 160 and you have 2 samples left go molecules to finish them too. Or raund > 180 go molecules to finish them even you have 1 sample.
+- If you can't make any of them release one of them to diagnosis station and take new one from samples station.
+- If you are at LABORATORY and you complete some of the samples give them and go samples station to take new samples. But if round > 160 and you have 2 samples left go molecules to finish them too. Or round > 180 go molecules to finish them even you have 1 sample.
 
 
 # Summary
-Overall I tried tons fo things attack, defence, distraction, wait with molecules but it took 10 hours to go silver and 20-30 hours to trying to be gold but I stuck on Silver #2/500 and #500 in total. Mostly first I do what enemy do and than improve it, it works until bronze. Bronze to silver i became more creative. That was very fun at the beginning but stuck at silver was exhausting. At the end of I did my best.
+Overall I tried tons of things attack, defence, distraction, wait with molecules but it took 10 hours to go silver and 20-30 hours to trying to be gold but I stuck on Silver #2/500 and #403 in total. Mostly first I do what enemy do and than improve it, it works until bronze. Bronze to silver I became more creative. That was very fun at the beginning but stuck at silver was exhausting. At the end of I did my best.
 
 
