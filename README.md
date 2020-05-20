@@ -145,6 +145,18 @@ I update my choosing rank function taking 3 two's and 3 three's can be problem s
    let rankOrder = [1,1,1,1,1,1,1,2,2,1,2,2,2,3,2,3,2,3,2,3,3,2,3,3,2,3,2,3,2,3,2,3];
 ```
 
+# My Final Strategy
+- If you are at laboratory and you have done samples give all.
+- If you don't have any samples go samples and take 3 if first round take 2 because enemy can block your molecules.
+- If you have undiagnosed samples go diagnoise station and diagnoit them.
+- If you have diagnoised samples and you can make them go molecules and try to make all it once in given order. For example if we have 2 sample
+(AAA) give expertise c and (BBB) give expertise B my bot will going to take BBBAA and that will be enough to complate both of them becuase I'm also calculating expertise coming from samples.
+- If you are at MOLECULES and enemy at somewhere else try to complate sample with most molecule.
+- If you are at MOLECULES and if you can block one of the enemy samples with taking 1,2,3 molecule block it.
+- If you can't make any of them release one of them to diagnoise station and take new one from samples station.
+- If you are at LABORATORY and you complate some of the samples give them and go samples station to take new samples. But if raund > 160 and you have 2 samples left go molecules to finish them too. Or raund > 180 go molecules to finish them even you have 1 sample.
+
+
 # Summary
 Overall I tried tons fo things attack, defence, distraction, wait with molecules but it took 10 hours to go silver and 20-30 hours to trying to be gold but I stuck on Silver #2/500 and #500 in total. Mostly first I do what enemy do and than improve it, it works until bronze. Bronze to silver i became more creative. That was very fun at the beginning but stuck at silver was exhausting. At the end of I did my best.
 
