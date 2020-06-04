@@ -1,7 +1,7 @@
 # Codingame Code4Life Challenge
 # Tebaks - Kenan Abbak
-#### Silver #2/506 
-#### Total #403
+#### Gold #168/312
+#### Total #262
 
 <details>
 <summary>Click to expand</summary>
@@ -10,6 +10,7 @@
   - [Wood 1 to Bronz](#wood-1-to-bronze)
   - [Bronze to Silver](#bronze-to-silver)
   - [Silver](#silver)
+  - [Silver To Gold](#silver-to-gold)
   - [My Final Strategy](#my-final-strategy)
   - [Summary](#summary)
 
@@ -17,7 +18,6 @@
 </details>
 
 # Wood 2 to Wood 1
-
 
 I just check all samples and take sample with most score. Then go molecules to take everything need to complate sample, when sample is complated go laboratory to serve And thats enough for rank up to Wood 1.
 
@@ -147,6 +147,9 @@ I update my choosing rank function taking 3 two's and 3 three's can be problem s
    let rankOrder = [1,1,1,1,1,1,1,2,2,1,2,2,2,3,2,3,2,3,2,3,3,2,3,3,2,3,2,3,2,3,2,3];
 ```
 
+# Silver To Gold
+I have same strategy. I was in second place in silver when boss score going down because of other player I ranked up to gold. My last submission was in may 20.
+
 # My Final Strategy
 - If you are at laboratory and you have done samples give all.
 - If you don't have any samples go samples and take 3 if first round take 2 because enemy can block your molecules.
@@ -160,6 +163,6 @@ I update my choosing rank function taking 3 two's and 3 three's can be problem s
 
 
 # Summary
-Overall I tried tons of things attack, defence, distraction, wait with molecules but it took 10 hours to go silver and 20-30 hours to trying to be gold but I stuck on Silver #2/500 and #403 in total. Mostly first I do what enemy do and than improve it, it works until bronze. Bronze to silver I became more creative. That was very fun at the beginning but stuck at silver was exhausting. At the end of I did my best.
+Overall I tried tons of things attack, defence, distraction, wait with molecules but it took 10 hours to go silver and 20-30 hours to trying to be gold but I stuck on Silver #2/500 and #403 in total. Mostly first I do what enemy do and than improve it, it works until bronze. Bronze to silver I became more creative. That was very fun at the beginning but stuck at silver was exhausting. But system raise my rank up to gold 15 days after my submission because of Boss lost of point. At the end I did my best. I'm happy with result.
 
 
